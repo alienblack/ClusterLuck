@@ -14,15 +14,17 @@ if [[ -z "${t:-}" || -z "${n:-}" ]]; then
   exit 1
 fi
 
-if [[ ! -x "$dir/build/twotree_solver" || ! -x "$dir/build/manytree_solver" ]]; then
-  make -s -C "$dir"
-fi
-
 if [[ "$t" == "2" ]]; then
   if (( n > 500 )); then
     while true; do sleep 3600; done
   fi
+  if [[ ! -x "$dir/build/twotree_solver" ]]; then
+    make -s -C "$dir" build/twotree_solver
+  fi
   exec "$dir/build/twotree_solver" < "$tmp"
 fi
 
+if [[ ! -x "$dir/build/manytree_solver" ]]; then
+  make -s -C "$dir" build/manytree_solver
+fi
 exec "$dir/build/manytree_solver" < "$tmp"
