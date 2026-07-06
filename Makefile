@@ -30,11 +30,11 @@ $(BUILD)/manytree_solver: src_manytree/manytree_pool_packer.cpp $(CADICAL_LIB) |
 
 $(HIGHS_LIB):
 	cmake -S $(HIGHS_ROOT) -B $(HIGHS_BUILD) -DBUILD_SHARED_LIBS=OFF -DFAST_BUILD=ON -DCMAKE_BUILD_TYPE=Release
-	cmake --build $(HIGHS_BUILD) --target libhighs --parallel 1
+	cmake --build $(HIGHS_BUILD) --target highs --parallel 1
 
 $(BUILD)/twotree_solver: $(HIGHS_LIB) | $(BUILD)
-	$(MAKE) -C RS build/rs_submit HIGHS_ROOT=$(HIGHS_ROOT) CXXFLAGS="$(CXXFLAGS)"
-	cp RS/build/rs_submit $@
+	$(MAKE) -C RS h56_main_submit HIGHS_ROOT=$(HIGHS_ROOT) CXXFLAGS="$(CXXFLAGS)"
+	cp RS/main_submit $@
 
 clean:
 	rm -rf $(BUILD)

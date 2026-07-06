@@ -25,6 +25,13 @@ build/rs_submit: CXXFLAGS += -static -s
 build/rs_submit: clean $(OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJ) $(HIGHS_LIB) $(LDLIBS) -o $@
 
+build/h56_route_submit: src_twotree/h56_route.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -static -s -I$(HIGHS_INC) -I$(HIGHS_BUILD_INC) $< $(HIGHS_LIB) $(LDLIBS) -o $@
+
+h56_main_submit: build/h56_route_submit
+	cp build/h56_route_submit main_submit
+
 clean:
 	rm -rf build
 
