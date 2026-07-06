@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+dir="$(cd "$(dirname "$0")" && pwd)"
+tmp="${TMPDIR:-/tmp}/pace26_input_$$.nw"
+trap 'rm -f "$tmp"' EXIT
+cat > "$tmp"
+
+read -r t n < <(
+  awk '/^#p[[:space:]]+/ { print $2, $3; exit }' "$tmp"
+)
+
+if [[ -z "${t:-}" || -z "${n:-}" ]]; then
+  exit 1
+fi
+
+if [[ ! -x "$dir/build/twotree_solver" || ! -x "$dir/build/manytree_solver" ]]; then
+  make -s -C "$dir"
+fi
+
+if [[ "$t" == "2" ]]; then
+  if (( n > 500 )); then
+    while true; do sleep 3600; done
+  fi
+  exec "$dir/build/twotree_solver" < "$tmp"
+fi
+
+exec "$dir/build/manytree_solver" < "$tmp"

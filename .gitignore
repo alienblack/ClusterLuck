@@ -1,0 +1,10 @@
+/build/
+/RS/build/
+/third_party/highs/build*/
+*.o
+*.d
+*.a
+*.so
+*.dylib
+*.out
+*.err
