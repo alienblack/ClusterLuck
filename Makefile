@@ -1,6 +1,7 @@
 CXX ?= g++
 CXXFLAGS ?= -O3 -DNDEBUG -std=c++17 -Wall -Wextra -MMD -MP -static -s
 BUILD := build
+EMBED := $(BUILD)/embed
 HIGHS_ROOT := $(CURDIR)/third_party/highs
 HIGHS_BUILD := $(HIGHS_ROOT)/build-linux-static
 HIGHS_LIB := $(HIGHS_BUILD)/lib/libhighs.a
@@ -24,9 +25,12 @@ AGGRESSIVE_FLAGS := \
 
 .PHONY: all clean
 
-all: $(BUILD)/manytree_solver $(BUILD)/twotree_solver
+all: solver_submit
 
 $(BUILD):
+	mkdir -p $@
+
+$(EMBED): | $(BUILD)
 	mkdir -p $@
 
 $(CADICAL_LIB):
@@ -43,6 +47,17 @@ $(HIGHS_LIB):
 $(BUILD)/twotree_solver: $(HIGHS_LIB) | $(BUILD)
 	$(MAKE) -C RS h56_main_submit HIGHS_ROOT=$(HIGHS_ROOT) CXXFLAGS="$(CXXFLAGS)"
 	cp RS/main_submit $@
+
+$(EMBED)/manytree_solver.o: $(BUILD)/manytree_solver | $(EMBED)
+	cp $< $(EMBED)/manytree_solver
+	cd $(EMBED) && ld -r -b binary -o manytree_solver.o manytree_solver
+
+$(EMBED)/twotree_solver.o: $(BUILD)/twotree_solver | $(EMBED)
+	cp $< $(EMBED)/twotree_solver
+	cd $(EMBED) && ld -r -b binary -o twotree_solver.o twotree_solver
+
+solver_submit: combined_wrapper.cpp $(EMBED)/manytree_solver.o $(EMBED)/twotree_solver.o
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
 clean:
 	rm -rf $(BUILD)
